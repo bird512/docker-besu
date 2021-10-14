@@ -1,0 +1,316 @@
+version: '3.4'
+
+x-tessera-def:
+  &tessera-def
+  image: quorumengineering/tessera:latest
+  expose:
+    - 9081
+    - 9101
+    - 9000
+  restart: "no"
+  healthcheck:
+    test: ["CMD", "wget", "--spider", "--proxy", "off", "http://localhost:9000/upcheck"]
+    interval: 5s
+    timeout: 5s
+    retries: 20
+    start_period: 100s
+  entrypoint:
+    - /bin/sh
+    - -c
+    - |
+      mkdir -p /var/log/tessera/;
+      mkdir -p /opt/tessera/;
+      mkdir -p /opt/keys/;
+      cat << EOF > /opt/tessera/tessera.json
+        {
+          "mode": "orion",
+          "useWhiteList": false,
+          "jdbc": {
+              "username": "sa",
+              "password": "",
+              "url": "jdbc:h2:/opt/tessera/target/h2/tessera;MODE=Oracle;TRACE_LEVEL_SYSTEM_OUT=0",
+              "autoCreateTables": true
+          },
+          "serverConfigs":[
+              {
+                  "app":"ThirdParty",
+                  "enabled": true,
+                  "serverAddress": "http://$$(hostname -i):9081",
+                  "communicationType" : "REST",
+                  "cors" : {
+                      "allowedMethods" : ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
+                      "allowedOrigins" : "*",
+                      "allowedHeaders" : ["content-type"],
+                      "allowCredentials" : true
+                  }
+              },
+              {
+                  "app":"Q2T",
+                  "enabled": true,
+                  "serverAddress": "http://$$(hostname -i):9101"
+              },
+              {
+                  "app":"P2P",
+                  "enabled": true,
+                  "serverAddress":"http://$$(hostname -i):9000",
+                  "sslConfig": {
+                      "tls": "OFF"
+                  }
+              }
+          ],
+          "peer": [
+              {
+                  "url": "http://tessera1:9000"
+              },
+              {
+                  "url": "http://tessera2:9000"
+              },
+              {
+                  "url": "http://tessera3:9000"
+              },
+              {
+                  "url": "http://tessera4:9000"
+              }
+          ],
+          "keys": {
+              "passwords": [],
+              "keyData": [
+                  {
+                      "privateKeyPath": "/opt/keys/tessera.key",
+                      "publicKeyPath": "/opt/keys/tessera.pub"
+                  }
+              ]
+          },
+          "alwaysSendTo": []
+        }
+      EOF
+      cat /opt/tessera/tessera.json;
+      /tessera/bin/tessera -configfile /opt/tessera/tessera.json 2>&1 | tee -a /var/log/tessera/tessera-$$(hostname -i).log
+
+
+
+networks:
+  ssd-besu-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.229.0/24
+
+services:
+  tessera1:
+    container_name: tessera1
+    << : *tessera-def
+    volumes:
+      - ./node1/tessera:/opt/tessera
+      - ./node1/keys:/opt/keys
+      - ./logs/tessera:/var/log/tessera
+    ports:
+      - 9081:9081
+    networks:
+      ssd-besu-network:
+        ipv4_address: 172.16.229.21
+
+  tessera2:
+    container_name: tessera2
+    << : *tessera-def
+    volumes:
+      - ./node2/tessera:/opt/tessera
+      - ./node2/keys:/opt/keys
+      - ./logs/tessera:/var/log/tessera
+    ports:
+      - 9082:9081
+    networks:
+      ssd-besu-network:
+        ipv4_address: 172.16.229.22
+
+  tessera3:
+    container_name: tessera3
+    << : *tessera-def
+    volumes:
+      - ./node3/tessera:/opt/tessera
+      - ./node3/keys:/opt/keys
+      - ./logs/tessera:/var/log/tessera
+    ports:
+      - 9083:9081
+    networks:
+      ssd-besu-network:
+        ipv4_address: 172.16.229.23
+
+  tessera4:
+    container_name: tessera4
+    << : *tessera-def
+    volumes:
+      - ./node4/tessera:/opt/tessera
+      - ./node4/keys:/opt/keys
+      - ./logs/tessera:/var/log/tessera
+    ports:
+      - 9084:9081
+    networks:
+      ssd-besu-network:
+        ipv4_address: 172.16.229.24
+
+  besu1:
+    container_name: besu1
+    image: hyperledger/besu:21.7.4
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        mkdir -p /var/log/besu/;
+        mkdir -p /opt/besu/;
+        mkdir -p /opt/keys/;
+        /opt/besu/bin/besu --data-path=/opt/besu/data \
+        --genesis-file=/opt/besu/cliquegenesis.json \
+        --network-id 13372 \
+        --node-private-key-file=/opt/keys/besu.key \
+        --rpc-http-enabled \
+        --host-allowlist="*" \
+        --rpc-http-cors-origins="all" \
+        --rpc-ws-enabled \
+        --graphql-http-enabled --graphql-http-port=8551 --graphql-http-cors-origins=["*"] \
+        --metrics-enabled --metrics-host="0.0.0.0" --metrics-port=9545 \
+        --privacy-enabled \
+        --privacy-url=http://tessera1:9101 \
+        --privacy-public-key-file=/opt/keys/tessera.pub \
+        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,PERM \
+        --min-gas-price=0 \
+        2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
+    volumes:
+      - ./cliquegenesis.json:/opt/besu/cliquegenesis.json
+      - ./node1/besu:/opt/besu/data
+      - ./node1/keys:/opt/keys
+      - ./logs/besu:/var/log/besu
+    depends_on:
+      - tessera1
+    ports:
+      - 8545:8545/tcp
+      - 9545:8546/tcp
+    networks:
+      ssd-besu-network:
+        ipv4_address: 172.16.229.100
+
+  besu2:
+    container_name: besu2
+    image: hyperledger/besu:21.7.4
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        mkdir -p /var/log/besu/;
+        mkdir -p /opt/besu/;
+        mkdir -p /opt/keys/;
+        /opt/besu/bin/besu --data-path=/opt/besu/data \
+        --genesis-file=/opt/besu/cliquegenesis.json \
+        --network-id 13372 \
+        --bootnodes=enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.100:30303 \
+        --node-private-key-file=/opt/keys/besu.key \
+        --rpc-http-enabled \
+        --host-allowlist="*" \
+        --rpc-http-cors-origins="all" \
+        --rpc-ws-enabled \
+        --graphql-http-enabled --graphql-http-port=8551 --graphql-http-cors-origins=["*"] \
+        --metrics-enabled --metrics-host="0.0.0.0" --metrics-port=9545 \
+        --privacy-enabled \
+        --privacy-url=http://tessera2:9101 \
+        --privacy-public-key-file=/opt/keys/tessera.pub \
+        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,PERM \
+        --min-gas-price=0 \
+        2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
+    volumes:
+      - ./cliquegenesis.json:/opt/besu/cliquegenesis.json
+      - ./node2/besu:/opt/besu/data
+      - ./node2/keys:/opt/keys
+      - ./logs/besu:/var/log/besu
+    depends_on:
+      - besu1
+      - tessera2
+    ports:
+      - 8546:8545/tcp
+      - 9546:8546/tcp
+    networks:
+      ssd-besu-network:
+        ipv4_address: 172.16.229.101
+    
+  besu3:
+    container_name: besu3
+    image: hyperledger/besu:21.7.4
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        mkdir -p /var/log/besu/;
+        mkdir -p /opt/besu/;
+        mkdir -p /opt/keys/;
+        /opt/besu/bin/besu --data-path=/opt/besu/data \
+        --genesis-file=/opt/besu/cliquegenesis.json \
+        --network-id 13372 \
+        --bootnodes=enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.100:30303 \
+        --node-private-key-file=/opt/keys/besu.key \
+        --rpc-http-enabled \
+        --host-allowlist="*" \
+        --rpc-http-cors-origins="all" \
+        --rpc-ws-enabled \
+        --graphql-http-enabled --graphql-http-port=8551 --graphql-http-cors-origins=["*"] \
+        --metrics-enabled --metrics-host="0.0.0.0" --metrics-port=9545 \
+        --privacy-enabled \
+        --privacy-url=http://tessera3:9101 \
+        --privacy-public-key-file=/opt/keys/tessera.pub \
+        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV, PERM \
+        --min-gas-price=0 \
+        2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
+    volumes:
+      - ./cliquegenesis.json:/opt/besu/cliquegenesis.json
+      - ./node3/besu:/opt/besu/data
+      - ./node3/keys:/opt/keys
+      - ./logs/besu:/var/log/besu
+    depends_on:
+      - besu1
+      - tessera3
+    ports:
+      - 8547:8545/tcp
+      - 9547:8546/tcp
+    networks:
+      ssd-besu-network:
+        ipv4_address: 172.16.229.102
+
+  besu4:
+    container_name: besu4
+    image: hyperledger/besu:21.7.4
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        mkdir -p /var/log/besu/;
+        mkdir -p /opt/besu/;
+        mkdir -p /opt/keys/;
+        /opt/besu/bin/besu --data-path=/opt/besu/data \
+        --genesis-file=/opt/besu/cliquegenesis.json \
+        --network-id 13372 \
+        --bootnodes=enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.100:30303 \
+        --node-private-key-file=/opt/keys/besu.key \
+        --rpc-http-enabled \
+        --host-allowlist="*" \
+        --rpc-http-cors-origins="all" \
+        --rpc-ws-enabled \
+        --graphql-http-enabled --graphql-http-port=8551 --graphql-http-cors-origins=["*"] \
+        --metrics-enabled --metrics-host="0.0.0.0" --metrics-port=9545 \
+        --privacy-enabled \
+        --privacy-url=http://tessera4:9101 \
+        --privacy-public-key-file=/opt/keys/tessera.pub \
+        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV, PERM \
+        --min-gas-price=0 \
+        2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
+    volumes:
+      - ./cliquegenesis.json:/opt/besu/cliquegenesis.json
+      - ./node4/besu:/opt/besu/data
+      - ./node4/keys:/opt/keys
+      - ./logs/besu:/var/log/besu
+    depends_on:
+      - besu1
+      - tessera4
+    ports:
+      - 8548:8545/tcp
+      - 9548:8546/tcp
+    networks:
+      ssd-besu-network:
+        ipv4_address: 172.16.229.103
