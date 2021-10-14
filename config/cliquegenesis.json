@@ -1,0 +1,55 @@
+{
+  "config":{
+    "chainId":1337,
+    "constantinoplefixblock": 0,
+    "clique":{
+      "blockperiodseconds":3,
+      "epochlength":30000
+    }
+  },
+  "coinbase":"0x0000000000000000000000000000000000000000",
+  "difficulty":"0x1",
+
+"extraData":"0x0000000000000000000000000000000000000000000000000000000000000000f1bdec6c1cbeec7f6b1ba4eca2b1a675aa88a46e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "gasLimit":"0xa00000",
+  "mixHash":"0x0000000000000000000000000000000000000000000000000000000000000000",
+  "nonce":"0x0",
+  "timestamp":"0x5c51a607",
+  "alloc": {
+    "f1bdec6c1cbeec7f6b1ba4eca2b1a675aa88a46e": {
+      "privateKey": "4d512f84bc0f48173ff5dd3d4bdbb519804071c506b8094e896cdf493e25ee48",
+      "comment": "node one",
+      "balance": "90000000000000000000000"
+    },
+    "4b83188c2757e74fd6c047479d44d6d4d0b66e70": {
+      "privateKey": "7243f1dbc9e2ab06cb11d22983ecbcacbe849298be4aba7bac3912233ead32a5",
+      "comment": "node two",
+      "balance": "90000000000000000000000"
+    },
+    "72e2b556cd36f8a680941165c3996bc2c06bfc75": {
+      "privateKey": "2f24c4af107fdb4c0e650f3dd2b3871a4a93bce6fc6dbdf446632554e239a649",
+      "comment": "node three",
+      "balance": "90000000000000000000000"
+    },
+    "a22f77cc8471df6971a759aaada46c925acf08bd": {
+      "privateKey": "ee55cf05bb59c77e5f4f66fb185dfc8b49b12d97213ddfd117ed8567319e6f4b",
+      "comment": "node four",
+      "balance": "90000000000000000000000"
+    },
+    "fe3b557e8fb62b89f4916b721be55ceb828dbd73": {
+      "privateKey": "8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63",
+      "comment": "private key and this comment are ignored.  In a real chain, the private key should NOT be stored",
+      "balance": "0xad78ebc5ac6200000"
+    },
+    "627306090abaB3A6e1400e9345bC60c78a8BEf57": {
+      "privateKey": "c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3",
+      "comment": "private key and this comment are ignored.  In a real chain, the private key should NOT be stored",
+      "balance": "90000000000000000000000"
+    },
+    "f17f52151EbEF6C7334FAD080c5704D77216b732": {
+      "privateKey": "ae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f",
+      "comment": "private key and this comment are ignored.  In a real chain, the private key should NOT be stored",
+      "balance": "90000000000000000000000"
+    }
+ }
+}

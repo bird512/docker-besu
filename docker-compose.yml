@@ -101,8 +101,8 @@ services:
     container_name: tessera1
     << : *tessera-def
     volumes:
-      - ./node1/tessera:/opt/tessera
-      - ./node1/keys:/opt/keys
+      - ./data/tessera1:/opt/tessera
+      - ./config/node1:/opt/keys
       - ./logs/tessera:/var/log/tessera
     ports:
       - 9081:9081
@@ -114,8 +114,8 @@ services:
     container_name: tessera2
     << : *tessera-def
     volumes:
-      - ./node2/tessera:/opt/tessera
-      - ./node2/keys:/opt/keys
+      - ./data/tessera2:/opt/tessera
+      - ./config/node2:/opt/keys
       - ./logs/tessera:/var/log/tessera
     ports:
       - 9082:9081
@@ -127,8 +127,8 @@ services:
     container_name: tessera3
     << : *tessera-def
     volumes:
-      - ./node3/tessera:/opt/tessera
-      - ./node3/keys:/opt/keys
+      - ./data/tessera3:/opt/tessera
+      - ./config/node3:/opt/keys
       - ./logs/tessera:/var/log/tessera
     ports:
       - 9083:9081
@@ -140,8 +140,8 @@ services:
     container_name: tessera4
     << : *tessera-def
     volumes:
-      - ./node4/tessera:/opt/tessera
-      - ./node4/keys:/opt/keys
+      - ./data/tessera4:/opt/tessera
+      - ./config/node4:/opt/keys
       - ./logs/tessera:/var/log/tessera
     ports:
       - 9084:9081
@@ -161,7 +161,6 @@ services:
         mkdir -p /opt/keys/;
         /opt/besu/bin/besu --data-path=/opt/besu/data \
         --genesis-file=/opt/besu/cliquegenesis.json \
-        --network-id 13372 \
         --node-private-key-file=/opt/keys/besu.key \
         --rpc-http-enabled \
         --host-allowlist="*" \
@@ -176,18 +175,18 @@ services:
         --min-gas-price=0 \
         2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:
-      - ./cliquegenesis.json:/opt/besu/cliquegenesis.json
-      - ./node1/besu:/opt/besu/data
-      - ./node1/keys:/opt/keys
+      - ./config/cliquegenesis.json:/opt/besu/cliquegenesis.json
+      - ./config/node1:/opt/keys
+      - ./data/besu1:/opt/besu/data
       - ./logs/besu:/var/log/besu
     depends_on:
       - tessera1
     ports:
-      - 8545:8545/tcp
-      - 9545:8546/tcp
+      - 8545:8545
+      - 9545:8546
     networks:
       ssd-besu-network:
-        ipv4_address: 172.16.229.100
+        ipv4_address: 172.16.229.101
 
   besu2:
     container_name: besu2
@@ -201,8 +200,7 @@ services:
         mkdir -p /opt/keys/;
         /opt/besu/bin/besu --data-path=/opt/besu/data \
         --genesis-file=/opt/besu/cliquegenesis.json \
-        --network-id 13372 \
-        --bootnodes=enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.100:30303 \
+        --bootnodes=enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.101:30303 \
         --node-private-key-file=/opt/keys/besu.key \
         --rpc-http-enabled \
         --host-allowlist="*" \
@@ -217,19 +215,19 @@ services:
         --min-gas-price=0 \
         2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:
-      - ./cliquegenesis.json:/opt/besu/cliquegenesis.json
-      - ./node2/besu:/opt/besu/data
-      - ./node2/keys:/opt/keys
+      - ./config/cliquegenesis.json:/opt/besu/cliquegenesis.json
+      - ./config/node2:/opt/keys
+      - ./data/besu2:/opt/besu/data
       - ./logs/besu:/var/log/besu
     depends_on:
       - besu1
       - tessera2
     ports:
-      - 8546:8545/tcp
-      - 9546:8546/tcp
+      - 8546:8545
+      - 9546:8546
     networks:
       ssd-besu-network:
-        ipv4_address: 172.16.229.101
+        ipv4_address: 172.16.229.102
     
   besu3:
     container_name: besu3
@@ -243,8 +241,7 @@ services:
         mkdir -p /opt/keys/;
         /opt/besu/bin/besu --data-path=/opt/besu/data \
         --genesis-file=/opt/besu/cliquegenesis.json \
-        --network-id 13372 \
-        --bootnodes=enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.100:30303 \
+        --bootnodes=enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.101:30303 \
         --node-private-key-file=/opt/keys/besu.key \
         --rpc-http-enabled \
         --host-allowlist="*" \
@@ -259,19 +256,19 @@ services:
         --min-gas-price=0 \
         2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:
-      - ./cliquegenesis.json:/opt/besu/cliquegenesis.json
-      - ./node3/besu:/opt/besu/data
-      - ./node3/keys:/opt/keys
+      - ./config/cliquegenesis.json:/opt/besu/cliquegenesis.json
+      - ./config/node3:/opt/keys
+      - ./data/besu3:/opt/besu/data
       - ./logs/besu:/var/log/besu
     depends_on:
       - besu1
       - tessera3
     ports:
-      - 8547:8545/tcp
-      - 9547:8546/tcp
+      - 8547:8545
+      - 9547:8546
     networks:
       ssd-besu-network:
-        ipv4_address: 172.16.229.102
+        ipv4_address: 172.16.229.103
 
   besu4:
     container_name: besu4
@@ -285,8 +282,7 @@ services:
         mkdir -p /opt/keys/;
         /opt/besu/bin/besu --data-path=/opt/besu/data \
         --genesis-file=/opt/besu/cliquegenesis.json \
-        --network-id 13372 \
-        --bootnodes=enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.100:30303 \
+        --bootnodes=enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.101:30303 \
         --node-private-key-file=/opt/keys/besu.key \
         --rpc-http-enabled \
         --host-allowlist="*" \
@@ -301,16 +297,16 @@ services:
         --min-gas-price=0 \
         2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:
-      - ./cliquegenesis.json:/opt/besu/cliquegenesis.json
-      - ./node4/besu:/opt/besu/data
-      - ./node4/keys:/opt/keys
+      - ./config/cliquegenesis.json:/opt/besu/cliquegenesis.json
+      - ./config/node4:/opt/keys
+      - ./data/besu4:/opt/besu/data
       - ./logs/besu:/var/log/besu
     depends_on:
       - besu1
       - tessera4
     ports:
-      - 8548:8545/tcp
-      - 9548:8546/tcp
+      - 8548:8545
+      - 9548:8546
     networks:
       ssd-besu-network:
-        ipv4_address: 172.16.229.103
+        ipv4_address: 172.16.229.104
