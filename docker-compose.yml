@@ -87,8 +87,6 @@ x-tessera-def:
       cat /opt/tessera/tessera.json;
       /tessera/bin/tessera -configfile /opt/tessera/tessera.json 2>&1 | tee -a /var/log/tessera/tessera-$$(hostname -i).log
 
-
-
 networks:
   ssd-besu-network:
     driver: bridge
@@ -99,6 +97,7 @@ networks:
 services:
   tessera1:
     container_name: tessera1
+    hostname: tessera1
     << : *tessera-def
     volumes:
       - ./data/tessera1:/opt/tessera
@@ -112,6 +111,7 @@ services:
 
   tessera2:
     container_name: tessera2
+    hostname: tessera2
     << : *tessera-def
     volumes:
       - ./data/tessera2:/opt/tessera
@@ -125,6 +125,7 @@ services:
 
   tessera3:
     container_name: tessera3
+    hostname: tessera3
     << : *tessera-def
     volumes:
       - ./data/tessera3:/opt/tessera
@@ -138,6 +139,7 @@ services:
 
   tessera4:
     container_name: tessera4
+    hostname: tessera4
     << : *tessera-def
     volumes:
       - ./data/tessera4:/opt/tessera
@@ -151,6 +153,7 @@ services:
 
   besu1:
     container_name: besu1
+    hostname: besu1
     image: hyperledger/besu:21.7.4
     entrypoint:
       - /bin/bash
@@ -160,7 +163,7 @@ services:
         mkdir -p /opt/besu/;
         mkdir -p /opt/keys/;
         /opt/besu/bin/besu --data-path=/opt/besu/data \
-        --genesis-file=/opt/besu/cliquegenesis.json \
+        --genesis-file=/opt/besu/genesis.json \
         --node-private-key-file=/opt/keys/besu.key \
         --rpc-http-enabled \
         --host-allowlist="*" \
@@ -175,7 +178,7 @@ services:
         --min-gas-price=0 \
         2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:
-      - ./config/cliquegenesis.json:/opt/besu/cliquegenesis.json
+      - ./config/genesis.json:/opt/besu/genesis.json
       - ./config/node1:/opt/keys
       - ./data/besu1:/opt/besu/data
       - ./logs/besu:/var/log/besu
@@ -190,6 +193,7 @@ services:
 
   besu2:
     container_name: besu2
+    hostname: besu2
     image: hyperledger/besu:21.7.4
     entrypoint:
       - /bin/bash
@@ -199,7 +203,7 @@ services:
         mkdir -p /opt/besu/;
         mkdir -p /opt/keys/;
         /opt/besu/bin/besu --data-path=/opt/besu/data \
-        --genesis-file=/opt/besu/cliquegenesis.json \
+        --genesis-file=/opt/besu/genesis.json \
         --bootnodes=enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.101:30303 \
         --node-private-key-file=/opt/keys/besu.key \
         --rpc-http-enabled \
@@ -215,7 +219,7 @@ services:
         --min-gas-price=0 \
         2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:
-      - ./config/cliquegenesis.json:/opt/besu/cliquegenesis.json
+      - ./config/genesis.json:/opt/besu/genesis.json
       - ./config/node2:/opt/keys
       - ./data/besu2:/opt/besu/data
       - ./logs/besu:/var/log/besu
@@ -231,6 +235,7 @@ services:
     
   besu3:
     container_name: besu3
+    hostname: besu3
     image: hyperledger/besu:21.7.4
     entrypoint:
       - /bin/bash
@@ -240,7 +245,7 @@ services:
         mkdir -p /opt/besu/;
         mkdir -p /opt/keys/;
         /opt/besu/bin/besu --data-path=/opt/besu/data \
-        --genesis-file=/opt/besu/cliquegenesis.json \
+        --genesis-file=/opt/besu/genesis.json \
         --bootnodes=enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.101:30303 \
         --node-private-key-file=/opt/keys/besu.key \
         --rpc-http-enabled \
@@ -256,7 +261,7 @@ services:
         --min-gas-price=0 \
         2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:
-      - ./config/cliquegenesis.json:/opt/besu/cliquegenesis.json
+      - ./config/genesis.json:/opt/besu/genesis.json
       - ./config/node3:/opt/keys
       - ./data/besu3:/opt/besu/data
       - ./logs/besu:/var/log/besu
@@ -272,6 +277,7 @@ services:
 
   besu4:
     container_name: besu4
+    hostname: besu4
     image: hyperledger/besu:21.7.4
     entrypoint:
       - /bin/bash
@@ -281,7 +287,7 @@ services:
         mkdir -p /opt/besu/;
         mkdir -p /opt/keys/;
         /opt/besu/bin/besu --data-path=/opt/besu/data \
-        --genesis-file=/opt/besu/cliquegenesis.json \
+        --genesis-file=/opt/besu/genesis.json \
         --bootnodes=enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.101:30303 \
         --node-private-key-file=/opt/keys/besu.key \
         --rpc-http-enabled \
@@ -297,7 +303,7 @@ services:
         --min-gas-price=0 \
         2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:
-      - ./config/cliquegenesis.json:/opt/besu/cliquegenesis.json
+      - ./config/genesis.json:/opt/besu/genesis.json
       - ./config/node4:/opt/keys
       - ./data/besu4:/opt/besu/data
       - ./logs/besu:/var/log/besu
@@ -310,3 +316,15 @@ services:
     networks:
       ssd-besu-network:
         ipv4_address: 172.16.229.104
+
+  explorer:
+    container_name: explorer
+    hostname: explorer
+    image: alethio/ethereum-lite-explorer
+    depends_on:
+      - besu1
+    ports:
+      - 8070:80
+    networks:
+      ssd-besu-network:
+        ipv4_address: 172.16.229.50
