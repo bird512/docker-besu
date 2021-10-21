@@ -174,7 +174,8 @@ services:
         --privacy-enabled \
         --privacy-url=http://tessera1:9101 \
         --privacy-public-key-file=/opt/keys/tessera.pub \
-        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,PERM \
+        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
+        --rpc-ws-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
         --min-gas-price=0 \
         2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:
@@ -215,7 +216,8 @@ services:
         --privacy-enabled \
         --privacy-url=http://tessera2:9101 \
         --privacy-public-key-file=/opt/keys/tessera.pub \
-        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,PERM \
+        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
+        --rpc-ws-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
         --min-gas-price=0 \
         2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:
@@ -257,7 +259,8 @@ services:
         --privacy-enabled \
         --privacy-url=http://tessera3:9101 \
         --privacy-public-key-file=/opt/keys/tessera.pub \
-        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV, PERM \
+        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
+        --rpc-ws-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
         --min-gas-price=0 \
         2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:
@@ -299,7 +302,8 @@ services:
         --privacy-enabled \
         --privacy-url=http://tessera4:9101 \
         --privacy-public-key-file=/opt/keys/tessera.pub \
-        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV, PERM \
+        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
+        --rpc-ws-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
         --min-gas-price=0 \
         2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:

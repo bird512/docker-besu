@@ -7,9 +7,12 @@ besu rlp encode --from=toencode.json
 ### instruction to start
 
 start a fresh docker network:
-
-mkdir data
+./init.sh
 docker-compose up -d
 
 stop:
+docker-compose stop
+
+normal usage:
+docker-compose up -d
 docker-compose stop
