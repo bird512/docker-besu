@@ -160,27 +160,15 @@ services:
       - -c
       - |
         mkdir -p /var/log/besu/;
-        mkdir -p /opt/besu/;
-        mkdir -p /opt/keys/;
-        /opt/besu/bin/besu --data-path=/opt/besu/data \
-        --genesis-file=/opt/besu/genesis.json \
-        --node-private-key-file=/opt/keys/besu.key \
-        --rpc-http-enabled \
-        --host-allowlist="*" \
-        --rpc-http-cors-origins="all" \
-        --rpc-ws-enabled \
-        --graphql-http-enabled --graphql-http-port=8551 --graphql-http-cors-origins=["*"] \
-        --metrics-enabled --metrics-host="0.0.0.0" --metrics-port=9545 \
-        --privacy-enabled \
-        --privacy-url=http://tessera1:9101 \
-        --privacy-public-key-file=/opt/keys/tessera.pub \
-        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
-        --rpc-ws-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
-        --min-gas-price=0 \
-        2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
+        mkdir -p /opt/besu/config/;
+        /opt/besu/bin/besu --privacy-url=http://tessera1:9101 \
+          --config-file=/opt/besu/config/config.toml \
+          2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:
-      - ./config/genesis.json:/opt/besu/genesis.json
-      - ./config/node1:/opt/keys
+      - ./config/genesis.json:/opt/besu/config/genesis.json
+      - ./config/config.toml:/opt/besu/config/config.toml
+      - ./config/node1/besu.key:/opt/besu/config/besu.key
+      - ./config/node1/tessera.pub:/opt/besu/config/tessera.pub
       - ./data/besu1:/opt/besu/data
       - ./logs/besu:/var/log/besu
     depends_on:
@@ -201,28 +189,15 @@ services:
       - -c
       - |
         mkdir -p /var/log/besu/;
-        mkdir -p /opt/besu/;
-        mkdir -p /opt/keys/;
-        /opt/besu/bin/besu --data-path=/opt/besu/data \
-        --genesis-file=/opt/besu/genesis.json \
-        --bootnodes=enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.101:30303 \
-        --node-private-key-file=/opt/keys/besu.key \
-        --rpc-http-enabled \
-        --host-allowlist="*" \
-        --rpc-http-cors-origins="all" \
-        --rpc-ws-enabled \
-        --graphql-http-enabled --graphql-http-port=8551 --graphql-http-cors-origins=["*"] \
-        --metrics-enabled --metrics-host="0.0.0.0" --metrics-port=9545 \
-        --privacy-enabled \
-        --privacy-url=http://tessera2:9101 \
-        --privacy-public-key-file=/opt/keys/tessera.pub \
-        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
-        --rpc-ws-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
-        --min-gas-price=0 \
-        2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
+        mkdir -p /opt/besu/config/;
+        /opt/besu/bin/besu --privacy-url=http://tessera2:9101 \
+          --config-file=/opt/besu/config/config.toml \
+          2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:
-      - ./config/genesis.json:/opt/besu/genesis.json
-      - ./config/node2:/opt/keys
+      - ./config/genesis.json:/opt/besu/config/genesis.json
+      - ./config/config.toml:/opt/besu/config/config.toml
+      - ./config/node2/besu.key:/opt/besu/config/besu.key
+      - ./config/node2/tessera.pub:/opt/besu/config/tessera.pub
       - ./data/besu2:/opt/besu/data
       - ./logs/besu:/var/log/besu
     depends_on:
@@ -244,28 +219,15 @@ services:
       - -c
       - |
         mkdir -p /var/log/besu/;
-        mkdir -p /opt/besu/;
-        mkdir -p /opt/keys/;
-        /opt/besu/bin/besu --data-path=/opt/besu/data \
-        --genesis-file=/opt/besu/genesis.json \
-        --bootnodes=enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.101:30303 \
-        --node-private-key-file=/opt/keys/besu.key \
-        --rpc-http-enabled \
-        --host-allowlist="*" \
-        --rpc-http-cors-origins="all" \
-        --rpc-ws-enabled \
-        --graphql-http-enabled --graphql-http-port=8551 --graphql-http-cors-origins=["*"] \
-        --metrics-enabled --metrics-host="0.0.0.0" --metrics-port=9545 \
-        --privacy-enabled \
-        --privacy-url=http://tessera3:9101 \
-        --privacy-public-key-file=/opt/keys/tessera.pub \
-        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
-        --rpc-ws-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
-        --min-gas-price=0 \
-        2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
+        mkdir -p /opt/besu/config/;
+        /opt/besu/bin/besu --privacy-url=http://tessera3:9101 \
+          --config-file=/opt/besu/config/config.toml \
+          2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:
-      - ./config/genesis.json:/opt/besu/genesis.json
-      - ./config/node3:/opt/keys
+      - ./config/genesis.json:/opt/besu/config/genesis.json
+      - ./config/config.toml:/opt/besu/config/config.toml
+      - ./config/node3/besu.key:/opt/besu/config/besu.key
+      - ./config/node3/tessera.pub:/opt/besu/config/tessera.pub
       - ./data/besu3:/opt/besu/data
       - ./logs/besu:/var/log/besu
     depends_on:
@@ -287,28 +249,15 @@ services:
       - -c
       - |
         mkdir -p /var/log/besu/;
-        mkdir -p /opt/besu/;
-        mkdir -p /opt/keys/;
-        /opt/besu/bin/besu --data-path=/opt/besu/data \
-        --genesis-file=/opt/besu/genesis.json \
-        --bootnodes=enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.101:30303 \
-        --node-private-key-file=/opt/keys/besu.key \
-        --rpc-http-enabled \
-        --host-allowlist="*" \
-        --rpc-http-cors-origins="all" \
-        --rpc-ws-enabled \
-        --graphql-http-enabled --graphql-http-port=8551 --graphql-http-cors-origins=["*"] \
-        --metrics-enabled --metrics-host="0.0.0.0" --metrics-port=9545 \
-        --privacy-enabled \
-        --privacy-url=http://tessera4:9101 \
-        --privacy-public-key-file=/opt/keys/tessera.pub \
-        --rpc-http-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
-        --rpc-ws-api=ETH,NET,CLIQUE,WEB3,IBFT,EEA,PRIV,DEBUG,PERM \
-        --min-gas-price=0 \
-        2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
+        mkdir -p /opt/besu/config/;
+        /opt/besu/bin/besu --privacy-url=http://tessera4:9101 \
+          --config-file=/opt/besu/config/config.toml \
+          2>&1 | tee /var/log/besu/besu-$$(hostname -i).log
     volumes:
-      - ./config/genesis.json:/opt/besu/genesis.json
-      - ./config/node4:/opt/keys
+      - ./config/genesis.json:/opt/besu/config/genesis.json
+      - ./config/config.toml:/opt/besu/config/config.toml
+      - ./config/node4/besu.key:/opt/besu/config/besu.key
+      - ./config/node4/tessera.pub:/opt/besu/config/tessera.pub
       - ./data/besu4:/opt/besu/data
       - ./logs/besu:/var/log/besu
     depends_on:

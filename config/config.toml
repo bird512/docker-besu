@@ -1,0 +1,36 @@
+logging="INFO"
+host-allowlist=["*"]
+data-path="/opt/besu/data"
+genesis-file="/opt/besu/config/genesis.json"
+node-private-key-file="/opt/besu/config/besu.key"
+
+bootnodes=[
+    "enode://5b4bae47eccd3e217d4e37ad499307769acc07ee2f84466914a64805284ce4283dc7df2c7f89eb022b0c15f8cb2c21e761e433a1bef7a1b49b3f585e24c94b34@172.16.229.101:30303"
+]
+        
+# rpc
+rpc-http-enabled=true
+rpc-http-cors-origins=["*"]
+rpc-http-apis=["ETH", "NET", "WEB3", "CLIQUE", "IBFT", "EEA", "PRIV", "PERM"]
+
+rpc-ws-enabled=true
+rpc-ws-apis=["ETH", "NET", "WEB3", "CLIQUE", "IBFT", "EEA", "PRIV", "PERM"]
+
+discovery-enabled=true
+
+# graphql
+graphql-http-enabled=true
+graphql-http-port=8551
+graphql-http-cors-origins=["*"]
+
+# metrics
+metrics-enabled=true
+metrics-host="0.0.0.0"
+metrics-port=9545
+
+# privacy
+privacy-enabled=true
+privacy-public-key-file="/opt/besu/config/tessera.pub"
+
+
+min-gas-price=0
