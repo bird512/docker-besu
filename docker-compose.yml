@@ -52,6 +52,7 @@ x-tessera-def:
               {
                   "app":"P2P",
                   "enabled": true,
+                  "communicationType" : "REST",
                   "serverAddress":"http://$$(hostname -i):9000",
                   "sslConfig": {
                       "tls": "OFF"
@@ -154,7 +155,7 @@ services:
   besu1:
     container_name: besu1
     hostname: besu1
-    image: hyperledger/besu:21.7.4
+    image: hyperledger/besu:latest
     entrypoint:
       - /bin/bash
       - -c
@@ -183,7 +184,7 @@ services:
   besu2:
     container_name: besu2
     hostname: besu2
-    image: hyperledger/besu:21.7.4
+    image: hyperledger/besu:latest
     entrypoint:
       - /bin/bash
       - -c
@@ -213,7 +214,7 @@ services:
   besu3:
     container_name: besu3
     hostname: besu3
-    image: hyperledger/besu:21.7.4
+    image: hyperledger/besu:latest
     entrypoint:
       - /bin/bash
       - -c
@@ -243,7 +244,7 @@ services:
   besu4:
     container_name: besu4
     hostname: besu4
-    image: hyperledger/besu:21.7.4
+    image: hyperledger/besu:latest
     entrypoint:
       - /bin/bash
       - -c
@@ -273,11 +274,61 @@ services:
   explorer:
     container_name: explorer
     hostname: explorer
-    image: alethio/ethereum-lite-explorer
+    image: consensys/quorum-explorer:latest
+    entrypoint:
+    - /bin/sh
+    - -c
+    - |
+      cat << EOF > /app/config.json
+        {
+          "algorithm": "qbft",
+          "nodes": [
+            {
+              "name": "besu1",
+              "client": "besu",
+              "rpcUrl": "http://besu1:8545",
+              "privateTxUrl": "http://tessera1:9081",
+              "privateKey": "$$(cat /app/config/node1/besu.address)",
+              "accountAddress": "$$(cat /app/config/node1/besu.key)
+            },
+            {
+              "name": "besu2",
+              "client": "besu",
+              "rpcUrl": "http://besu1:8545",
+              "privateTxUrl": "http://tessera2:9081",
+              "privateKey": "$$(cat /app/config/node2/besu.address)",
+              "accountAddress": "$$(cat /app/config/node2/besu.key)
+            },
+            {
+              "name": "besu1",
+              "client": "besu",
+              "rpcUrl": "http://besu3:8545",
+              "privateTxUrl": "http://tessera3:9081",
+              "privateKey": "$$(cat /app/config/node3/besu.address)",
+              "accountAddress": "$$(cat /app/config/node3/besu.key)
+            },
+            {
+              "name": "besu4",
+              "client": "besu",
+              "rpcUrl": "http://besu4:8545",
+              "privateTxUrl": "http://tessera4:9081",
+              "privateKey": "$$(cat /app/config/node4/besu.address)",
+              "accountAddress": "$$(cat /app/config/node4/besu.key)
+            }
+          ]
+        }
+      EOF
+      cat /app/config.json;
+      cd /app;
+      npm i;
+      npm start
+    volumes:
+      - ./config:/app/config
+      - ./config/explorer/env.production:/app/.env.production
     depends_on:
       - besu1
     ports:
-      - 8070:80
+      - 8080:25000
     networks:
       ssd-besu-network:
         ipv4_address: 172.16.229.50
